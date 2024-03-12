@@ -10,9 +10,9 @@ import (
 	"notes/admin"
 	"notes/database"
 	"notes/middlewares"
+	"os"
 )
 
-var port string
 var DB *gorm.DB
 
 func init() {
@@ -21,9 +21,14 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 
-	port = "8080"
-	DB = database.Connect("admin", "root", "localhost", "dev").DB
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	host := os.Getenv("MYSQL_HOST")
+	dbName := os.Getenv("MYSQL_DB")
+
+	DB = database.Connect(user, password, host, dbName)
 }
+
 func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/**/*")
@@ -77,6 +82,7 @@ func main() {
 		}
 	})
 
+	port := os.Getenv("PORT")
 	err := router.Run(":" + port)
 	if err != nil {
 		return

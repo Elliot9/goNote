@@ -6,12 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Database struct
-type Database struct {
-	DB *gorm.DB
-}
-
-func Connect(user, password, host, dbName string) Database {
+func Connect(user, password, host, dbName string) *gorm.DB {
 	URL := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s", user, password,
 		host, dbName)
 	db, err := gorm.Open(mysql.Open(URL))
@@ -20,7 +15,5 @@ func Connect(user, password, host, dbName string) Database {
 		panic("Failed to connect to database!")
 	}
 
-	return Database{
-		DB: db,
-	}
+	return db
 }
