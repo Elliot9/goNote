@@ -3,30 +3,20 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/csrf"
-	"github.com/joho/godotenv"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"notes/admin"
 	"notes/database"
 	"notes/middlewares"
-	"os"
+	"notes/pkg/setting"
+	"strconv"
 )
 
 var DB *gorm.DB
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	user := os.Getenv("MYSQL_USER")
-	password := os.Getenv("MYSQL_PASSWORD")
-	host := os.Getenv("MYSQL_HOST")
-	dbName := os.Getenv("MYSQL_DB")
-
-	DB = database.Connect(user, password, host, dbName)
+	setting.Setup()
+	DB = database.Connect(setting.DatabaseSetting.User, setting.DatabaseSetting.Password, setting.DatabaseSetting.Host, setting.DatabaseSetting.Name)
 }
 
 func main() {
@@ -82,8 +72,7 @@ func main() {
 		}
 	})
 
-	port := os.Getenv("PORT")
-	err := router.Run(":" + port)
+	err := router.Run(":" + strconv.Itoa(setting.ServerSetting.HttpPort))
 	if err != nil {
 		return
 	}
